@@ -1,0 +1,30 @@
+[
+  {
+    "id": "minecraft:diamond",
+    "price": 100
+  },
+  {
+    "id": "minecraft:iron_ingot",
+    "price": 20
+  },
+  {
+    "id": "minecraft:gold_ingot",
+    "price": 25
+  },
+  {
+    "id": "minecraft:emerald",
+    "price": 125
+  },
+  {
+    "id": "minecraft:bamboo",
+    "price": 2
+  },
+  {
+    "id": "minecraft:oak_log",
+    "price": 2
+  },
+  {
+    "id": "minecraft:sugar_cane",
+    "price": 3
+  }
+]
