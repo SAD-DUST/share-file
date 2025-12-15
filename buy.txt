@@ -1,0 +1,58 @@
+[
+  {
+    "key": "totem",
+    "id": "minecraft:totem_of_undying",
+    "price": 500,
+    "amount": 1,
+    "category": "combat"
+  },
+  {
+    "key": "anchor",
+    "id": "minecraft:respawn_anchor",
+    "price": 120,
+    "amount": 1,
+    "category": "combat"
+  },
+  {
+    "key": "beef",
+    "id": "minecraft:cooked_beef",
+    "price": 6,
+    "amount": 8,
+    "category": "food"
+  },
+  {
+    "key": "bread",
+    "id": "minecraft:bread",
+    "price": 4,
+    "amount": 8,
+    "category": "food"
+  },
+  {
+    "key": "bamboo",
+    "id": "minecraft:bamboo",
+    "price": 10,
+    "amount": 16,
+    "category": "stuff"
+  },
+  {
+    "key": "book",
+    "id": "minecraft:book",
+    "price": 12,
+    "amount": 4,
+    "category": "stuff"
+  },
+  {
+    "key": "diamond",
+    "id": "minecraft:diamond",
+    "price": 250,
+    "amount": 1,
+    "category": "ore"
+  },
+  {
+    "key": "iron",
+    "id": "minecraft:iron_ingot",
+    "price": 30,
+    "amount": 4,
+    "category": "ore"
+  }
+]
