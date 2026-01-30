@@ -1,29 +1,33 @@
 // ==UserScript==
-// @name        Enhanced Wheel of Names - Free Stop + Exclusions
+// @name        Enhanced Wheel of Names - Free Stop + Exclusions + No Repeat
 // @namespace   Violentmonkey Scripts
 // @match       https://wheelofnames.com/*
 // @grant       none
-// @version     2.3
+// @version     2.6
 // @author      Enhanced Version
-// @description Enhanced with exclusion logic, free-stop physics, clipped labels, and slimmer text
+// @description Exclusions + free-stop physics + clipped labels + slimmer text + more colors + slimmer pointer + prevent back-to-back wins + split modal buttons
 // ==/UserScript==
 
 (function () {
   // --- CONFIGURATION ---
   const COLORS = [
-    { base: "#EEB211", gradient: ["#FFD700", "#EEB211"] },
-    { base: "#d50f25", gradient: ["#FF6B6B", "#d50f25"] },
-    { base: "#3369e8", gradient: ["#4D9DE0", "#3369e8"] },
-    { base: "#009925", gradient: ["#00D9A5", "#009925"] }
+    { base: "#EEB211", gradient: ["#FFD700", "#C89200"] },
+    { base: "#d50f25", gradient: ["#FF6B6B", "#B10B1B"] },
+    { base: "#3369e8", gradient: ["#4D9DE0", "#1E4ED8"] },
+    { base: "#009925", gradient: ["#00D9A5", "#007A1D"] },
+    { base: "#6F42C1", gradient: ["#9B6DFF", "#4B2A9B"] },
+    { base: "#0F766E", gradient: ["#2DD4BF", "#0B4F4A"] },
+    { base: "#B45309", gradient: ["#FDBA74", "#7C2D12"] },
+    { base: "#0B5ED7", gradient: ["#60A5FA", "#083B8A"] },
+    { base: "#A21CAF", gradient: ["#F472B6", "#701A75"] },
+    { base: "#1F2937", gradient: ["#6B7280", "#111827"] }
   ];
-  const POINTER_ANGLE = 0; // Pointer is at 0 radians (Right side)
 
-  // Names containing these keywords (case-insensitive, diacritic-insensitive) will NEVER win
+  const POINTER_ANGLE = 0;
   const EXCLUDE_KEYWORDS = ["thịnh", "thinh"];
 
   const NO_REPEAT_LAST_N = 1;
 
-  // Enhanced spin settings
   const MIN_SPINS = 15;
   const MAX_SPINS = 25;
   const MIN_DURATION_MS = 7000;
@@ -34,9 +38,7 @@
   // --- HELPERS ---
   function waitForElement(selector) {
     return new Promise((resolve) => {
-      if (document.querySelector(selector)) {
-        return resolve(document.querySelector(selector));
-      }
+      if (document.querySelector(selector)) return resolve(document.querySelector(selector));
       const observer = new MutationObserver(() => {
         if (document.querySelector(selector)) {
           resolve(document.querySelector(selector));
@@ -45,6 +47,27 @@
       });
       observer.observe(document.body, { childList: true, subtree: true });
     });
+  }
+
+  function normalizeAngle(a) {
+    a %= 2 * Math.PI;
+    if (a < 0) a += 2 * Math.PI;
+    return a;
+  }
+
+  function normalizeText(s) {
+    return (s || "")
+      .toString()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .trim();
+  }
+
+  function isExcludedByKeyword(name) {
+    if (!name) return false;
+    const n = normalizeText(name);
+    return EXCLUDE_KEYWORDS.some((kw) => n.includes(normalizeText(kw)));
   }
 
   // --- STYLES ---
@@ -67,19 +90,17 @@
       transition: transform 0.1s ease;
     }
 
-    canvas#customWheelCanvas:active {
-      transform: scale(0.985);
-    }
+    canvas#customWheelCanvas:active { transform: scale(0.985); }
 
     .custom-pointer {
       position: absolute;
-      right: -25px;
+      right: -22px;
       top: 50%;
       transform: translateY(-50%);
-      width: 50px;
-      height: 1px;
+      width: 42px;
+      height: 56px;
       z-index: 100;
-      filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.5));
+      filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.45));
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
@@ -91,35 +112,35 @@
       transform: translateY(-50%);
       width: 0;
       height: 0;
-      border-top: 35px solid transparent;
-      border-bottom: 35px solid transparent;
-      border-right: 50px solid var(--pointer-color, #ffffff);
+      border-top: 24px solid transparent;
+      border-bottom: 24px solid transparent;
+      border-right: 38px solid var(--pointer-color, #ffffff);
       transition: border-right-color 0.3s ease;
     }
 
     .custom-pointer::after {
       content: '';
       position: absolute;
-      left: 5px;
+      left: 4px;
       top: 50%;
       transform: translateY(-50%);
-      width: 8px;
-      height: 8px;
+      width: 6px;
+      height: 6px;
       background: rgba(255, 255, 255, 0.85);
       border-radius: 50%;
-      box-shadow: 0 0 10px rgba(255, 255, 255, 0.45);
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
     }
 
     @media (max-width: 900px) {
       .custom-pointer {
-        right: 5px;
-        width: 40px;
-        height: 60px;
+        right: 6px;
+        width: 34px;
+        height: 48px;
       }
       .custom-pointer::before {
-        border-top: 30px solid transparent;
-        border-bottom: 30px solid transparent;
-        border-right: 40px solid var(--pointer-color, #ffffff);
+        border-top: 20px solid transparent;
+        border-bottom: 20px solid transparent;
+        border-right: 30px solid var(--pointer-color, #ffffff);
       }
     }
 
@@ -131,9 +152,7 @@
       animation: modalAppear 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
     }
 
-    @keyframes modalAppear {
-      to { transform: scale(1); }
-    }
+    @keyframes modalAppear { to { transform: scale(1); } }
 
     .winner-text {
       background: linear-gradient(45deg, #FFD700, #FF6B6B);
@@ -143,10 +162,20 @@
       font-weight: 800;
       text-align: center;
     }
+
+    /* Make our colored buttons look consistent with Quasar */
+    .q-btn.enh-btn-red {
+      background: #d50f25 !important;
+      color: #fff !important;
+    }
+    .q-btn.enh-btn-blue {
+      background: #60A5FA !important; /* light blue */
+      color: #0b1b33 !important;
+    }
   `;
   document.head.appendChild(style);
 
-  // --- MODAL HTML ---
+  // --- MODAL HTML (split into Remove + Spin Again) ---
   const modalHTML = `
   <div id="q-portal--dialog--4">
     <div role="dialog" aria-modal="true" class="q-dialog fullscreen no-pointer-events q-dialog--modal" style="display:none;">
@@ -163,14 +192,20 @@
               </span>
             </div>
           </div>
-          <div class="q-card__actions justify-end q-card__actions--horiz row" style="padding: 15px;">
-            <button id="closeModalBtn" class="q-btn q-btn-item non-selectable no-outline q-btn--unelevated q-btn--rectangle q-btn--actionable q-focusable q-hoverable q-btn--no-uppercase" type="button" style="margin-right: 10px;">
+          <div class="q-card__actions justify-end q-card__actions--horiz row" style="padding: 15px; gap: 10px;">
+            <button id="closeModalBtn" class="q-btn q-btn-item non-selectable no-outline q-btn--unelevated q-btn--rectangle q-btn--actionable q-focusable q-hoverable q-btn--no-uppercase" type="button">
               <span class="q-focus-helper"></span>
               <span class="q-btn__content text-center col items-center q-anchor--skip justify-center row"><span class="block">Close</span></span>
             </button>
-            <button id="removeWinnerBtn" class="q-btn q-btn-item non-selectable no-outline q-btn--unelevated q-btn--rectangle bg-primary text-white q-btn--actionable q-focusable q-hoverable q-btn--no-uppercase" type="button">
+
+            <button id="removeWinnerBtn" class="q-btn q-btn-item non-selectable no-outline q-btn--unelevated q-btn--rectangle q-btn--actionable q-focusable q-hoverable q-btn--no-uppercase enh-btn-red" type="button">
               <span class="q-focus-helper"></span>
-              <span class="q-btn__content text-center col items-center q-anchor--skip justify-center row"><span class="block">Remove & Spin Again</span></span>
+              <span class="q-btn__content text-center col items-center q-anchor--skip justify-center row"><span class="block">Remove</span></span>
+            </button>
+
+            <button id="spinAgainBtn" class="q-btn q-btn-item non-selectable no-outline q-btn--unelevated q-btn--rectangle q-btn--actionable q-focusable q-hoverable q-btn--no-uppercase enh-btn-blue" type="button">
+              <span class="q-focus-helper"></span>
+              <span class="q-btn__content text-center col items-center q-anchor--skip justify-center row"><span class="block" style="color:white">Spin Again</span></span>
             </button>
           </div>
         </div>
@@ -191,8 +226,8 @@
   let radius = 0;
   let currentAngle = 0;
   let isSpinning = false;
+
   let recentWinners = [];
-  let winHistory = {};
 
   let ctx;
   let canvas;
@@ -230,9 +265,9 @@
       window.addEventListener("resize", resizeCanvas);
       canvas.addEventListener("click", spin);
 
-      // Modal events
       document.getElementById("closeModalBtn").addEventListener("click", closeModal);
-      document.getElementById("removeWinnerBtn").addEventListener("click", removeWinnerAndClose);
+      document.getElementById("removeWinnerBtn").addEventListener("click", removeWinnerOnly);
+      document.getElementById("spinAgainBtn").addEventListener("click", spinAgain);
       document.querySelector("#q-portal--dialog--4 .q-dialog__backdrop").addEventListener("click", closeModal);
 
       resizeCanvas();
@@ -243,45 +278,13 @@
 
   init();
 
-  // --- HELPERS ---
-  function normalizeAngle(a) {
-    a %= 2 * Math.PI;
-    if (a < 0) a += 2 * Math.PI;
-    return a;
-  }
-
-  function normalizeText(s) {
-    return (s || "")
-      .toString()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "") // Remove accents (Thịnh -> Thinh)
-      .toLowerCase()
-      .trim();
-  }
-
-  function isExcluded(name) {
-    if (!name) return false;
-    const n = normalizeText(name);
-    return EXCLUDE_KEYWORDS.some((kw) => n.includes(normalizeText(kw)));
-  }
-
   function getEntries() {
     const editor = document.querySelector(".basic-editor");
     if (!editor) return ["Add", "Names", "To", "Begin"];
-
-    const lines = editor.innerText
+    return editor.innerText
       .split("\n")
       .map((t) => t.trim())
       .filter((t) => t.length > 0);
-
-    lines.forEach(name => {
-      const normalized = normalizeText(name);
-      if (!winHistory[normalized]) {
-        winHistory[normalized] = { count: 0, lastWin: 0 };
-      }
-    });
-
-    return lines;
   }
 
   function resizeCanvas() {
@@ -302,7 +305,7 @@
 
   function indexAtPointer() {
     if (!entries.length) return 0;
-    const a = normalizeAngle(POINTER_ANGLE - currentAngle);
+    const a = normalizeAngle(POINTER_ANGLE - normalizeAngle(currentAngle));
     let idx = Math.floor(a / arc);
     return Math.max(0, Math.min(idx, entries.length - 1));
   }
@@ -314,11 +317,9 @@
     pointerElement.style.setProperty("--pointer-color", colorData.base);
   }
 
-  // --- DRAW ---
   function drawWheel() {
     entries = getEntries();
     if (!entries.length) entries = ["Empty Wheel"];
-
     arc = (2 * Math.PI) / entries.length;
     if (!ctx) return;
 
@@ -327,7 +328,6 @@
     ctx.translate(w / 2, h / 2);
     ctx.rotate(currentAngle);
 
-    // Slices
     for (let i = 0; i < entries.length; i++) {
       const start = i * arc;
       const end = start + arc;
@@ -355,18 +355,15 @@
     ctx.shadowOffsetY = 2;
     ctx.fill();
 
-    // --- Draw text ---
+    // Text
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillStyle = "white";
     ctx.shadowColor = "rgba(0, 0, 0, 0.35)";
     ctx.shadowBlur = 2;
-    ctx.shadowOffsetX = 0;
-    ctx.shadowOffsetY = 0;
 
     const fontSize = Math.max(12, radius * 0.075);
     ctx.font = `600 ${fontSize}px ${FONT_FAMILY}`;
-
     const textRadius = radius * 0.68;
 
     for (let i = 0; i < entries.length; i++) {
@@ -375,7 +372,6 @@
 
       ctx.save();
 
-      // Clip to wedge
       ctx.beginPath();
       ctx.moveTo(0, 0);
       ctx.arc(0, 0, radius, i * arc, (i + 1) * arc);
@@ -385,10 +381,9 @@
       ctx.rotate(mid);
       ctx.translate(textRadius, 0);
 
-      // Width-based truncation
       const maxWidth = Math.max(10, (radius - textRadius) + (arc * radius * 0.55));
-
       let text = rawText;
+
       if (ctx.measureText(text).width > maxWidth) {
         const ell = "…";
         let lo = 0, hi = text.length;
@@ -402,7 +397,6 @@
       }
 
       ctx.fillText(text, 0, 0);
-
       ctx.restore();
     }
 
@@ -410,55 +404,50 @@
     updatePointerColor();
   }
 
-  // --- RIGGED SPIN PHYSICS ---
   function customSpinEasing(t) {
     const deceleration = 1 - Math.pow(1 - t, 4);
     const microBounce = Math.sin(t * Math.PI * 8) * 0.005 * (1 - t);
     return Math.min(deceleration + microBounce, 1);
   }
 
+  function isTemporarilyExcluded(name) {
+    const n = normalizeText(name);
+    if (isExcludedByKeyword(name)) return true;
+    return recentWinners.includes(n);
+  }
+
   function spin() {
     if (isSpinning) return;
-
     drawWheel();
 
-    // 1. Identify valid winners (not excluded)
-    const validIndices = entries
+    let candidates = entries
       .map((name, index) => ({ name, index }))
-      .filter(item => !isExcluded(item.name))
+      .filter(item => !isTemporarilyExcluded(item.name))
       .map(item => item.index);
 
-    // Fallback: If all names are excluded, pick from all (or alert)
-    const candidates = validIndices.length > 0 ? validIndices : entries.map((_, i) => i);
+    if (candidates.length === 0) {
+      const keywordOnly = entries
+        .map((name, index) => ({ name, index }))
+        .filter(item => !isExcludedByKeyword(item.name))
+        .map(item => item.index);
+      candidates = keywordOnly.length ? keywordOnly : entries.map((_, i) => i);
+    }
 
-    // 2. Pick a winner index
     const winnerIdx = candidates[Math.floor(Math.random() * candidates.length)];
-
-    // 3. Calculate rotation to land on that winner
-    // The pointer is at 0 (Right).
-    // The center of slice 'i' is at angle (i * arc + arc / 2) relative to the wheel start.
-    // To get that slice to angle 0, the wheel must rotate by: - (i * arc + arc / 2).
-    // We add randomness inside the slice so it doesn't always land dead center.
     const sliceCenter = winnerIdx * arc + arc / 2;
-    const randomOffset = (Math.random() - 0.5) * (arc * 0.6); // 60% of slice width variance
-    const targetAngleRaw = - (sliceCenter + randomOffset);
 
-    // 4. Calculate total rotation (ensure it spins forward enough)
+    const randomOffset = (Math.random() - 0.5) * (arc * 0.35);
+    const targetAngleRaw = -(sliceCenter + randomOffset);
+
     const spins = Math.random() * (MAX_SPINS - MIN_SPINS) + MIN_SPINS;
     const duration = Math.random() * (MAX_DURATION_MS - MIN_DURATION_MS) + MIN_DURATION_MS;
 
-    // We need finalAngle to be > currentAngle + min_rotation
     let finalAngle = targetAngleRaw;
     const minRotation = currentAngle + (spins * 2 * Math.PI);
-
-    // Adjust finalAngle by adding 2PI until it passes the minimum rotation threshold
-    while (finalAngle < minRotation) {
-      finalAngle += 2 * Math.PI;
-    }
+    while (finalAngle < minRotation) finalAngle += 2 * Math.PI;
 
     const totalRotation = finalAngle - currentAngle;
-
-    const startAngle = normalizeAngle(currentAngle);
+    const startAngle = currentAngle;
     const t0 = performance.now();
 
     isSpinning = true;
@@ -474,24 +463,14 @@
       if (t < 1) {
         requestAnimationFrame(frame);
       } else {
-        // Wheel stopped
-        currentAngle = normalizeAngle(finalAngle);
+        currentAngle = finalAngle;
         drawWheel();
-
         isSpinning = false;
 
-        // We know the winner because we rigged it, but let's double-check index
-        const actualIdx = indexAtPointer();
-        const winnerName = entries[actualIdx];
+        const winnerName = entries[winnerIdx] ?? "Winner";
+        const normWinner = normalizeText(winnerName);
 
-        // Update history
-        const normalized = normalizeText(winnerName);
-        winHistory[normalized] = {
-          count: (winHistory[normalized]?.count || 0) + 1,
-          lastWin: Date.now()
-        };
-
-        recentWinners.unshift(winnerName);
+        recentWinners.unshift(normWinner);
         recentWinners = recentWinners.slice(0, NO_REPEAT_LAST_N);
 
         showWinnerModal(winnerName);
@@ -507,20 +486,23 @@
     if (modal) modal.style.display = "none";
   }
 
-  function removeWinnerAndClose() {
+  function removeWinnerOnly() {
     const winnerTextDisplay = document.getElementById("winnerNameDisplay");
     const winnerName = winnerTextDisplay ? winnerTextDisplay.textContent : "";
-    if (winnerName) {
-      const editor = document.querySelector(".basic-editor");
-      if (editor) {
-        const currentText = editor.innerText;
-        const lines = currentText.split("\n");
-        const newLines = lines.filter(line => line.trim() !== winnerName);
-        editor.innerText = newLines.join("\n");
-        drawWheel();
-      }
-    }
+    if (!winnerName) return;
+
+    const editor = document.querySelector(".basic-editor");
+    if (!editor) return;
+
+    const lines = editor.innerText.split("\n");
+    editor.innerText = lines.filter(line => line.trim() !== winnerName).join("\n");
+    drawWheel();
+  }
+
+  function spinAgain() {
     closeModal();
+    // small delay so modal close feels smooth
+    setTimeout(() => spin(), 120);
   }
 
   function showWinnerModal(name) {
