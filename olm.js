@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         OLM Suite
 // @namespace    http://tampermonkey.net/
-// @version      1.5
-// @updateURL    https://your-repo/olm-suite.meta.js
-// @downloadURL  https://your-repo/olm-suite.user.js
-// @description  Added Settings Tab, Custom Font/Color, New Minimize Design, Risk Patch v3.0 with Auto-Submit
+// @version      1.7
+// @updateURL    https://raw.githubusercontent.com/SAD-DUST/share-file/refs/heads/main/meta.js
+// @downloadURL  https://raw.githubusercontent.com/SAD-DUST/share-file/refs/heads/main/olm.js
+// @description  What you really need for OLM
 // @author       SAD_DUST
 // @match        https://olm.vn/*
 // @grant        none
