@@ -796,7 +796,7 @@
 
         uiContainer.innerHTML = `
             <div id="olm-header">
-                <div id="olm-title"><span class="long-title">🔮 OLM v1.5</span><span class="short-title" style="display:none;">OLM</span></div>
+                <div id="olm-title"><span class="long-title">🔮 OLM v1.7</span><span class="short-title" style="display:none;">OLM</span></div>
                 <button id="btn-minimize" class="btn-minimize">+</button>
             </div>
             <div class="olm-tabs">
