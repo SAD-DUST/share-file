@@ -4,6 +4,8 @@
 // @match       https://wheelofnames.com/*
 // @grant       none
 // @version     2.6
+// @updateURL    https://raw.githubusercontent.com/SAD-DUST/share-file/refs/heads/main/wheelofname.js
+// @downloadURL  https://raw.githubusercontent.com/SAD-DUST/share-file/refs/heads/main/wheelofname.js
 // @author      Enhanced Version
 // @description Exclusions + free-stop physics + clipped labels + slimmer text + more colors + slimmer pointer + prevent back-to-back wins + split modal buttons
 // ==/UserScript==
